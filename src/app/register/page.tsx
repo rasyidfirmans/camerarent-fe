@@ -1,10 +1,13 @@
 'use client'
 
 import Button from '@/components/Button'
-import { RegisterFormSchema } from '@/utils/AuthSchema'
+import {
+  RegisterFormStep2Schema,
+  RegisterFormStep1Schema,
+} from '@/utils/AuthSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import Step1 from './Step1'
@@ -13,7 +16,8 @@ import Image from 'next/image'
 import ProgressBar from '@/components/ProgressBar'
 import { MoveLeft, MoveRight } from 'lucide-react'
 
-type RegisterFormData = z.infer<typeof RegisterFormSchema>
+type RegisterFormStep1 = z.infer<typeof RegisterFormStep1Schema>
+type RegisterFormStep2 = z.infer<typeof RegisterFormStep2Schema>
 
 const steps = [
   {
@@ -28,17 +32,27 @@ const steps = [
 
 const RegisterPage = () => {
   const [currentStep, setCurrentStep] = React.useState(1)
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterFormData>({ resolver: zodResolver(RegisterFormSchema) })
+  const [formData, setFormData] = React.useState<
+    RegisterFormStep1 | RegisterFormStep2
+  >()
+  const formStep1 = useForm<RegisterFormStep1>({
+    resolver: zodResolver(RegisterFormStep1Schema),
+  })
+  const formStep2 = useForm<RegisterFormStep2>({
+    resolver: zodResolver(RegisterFormStep2Schema),
+  })
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log(data)
+  const onSubmit = (data: RegisterFormStep2) => {
+    const finalData = {
+      ...formData,
+      ...data,
+    }
+    setFormData(finalData)
   }
 
-  const next = () => {
+  const next = (data: RegisterFormStep1) => {
+    setFormData(data)
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
     }
@@ -49,6 +63,10 @@ const RegisterPage = () => {
       setCurrentStep(currentStep - 1)
     }
   }
+
+  useEffect(() => {
+    console.log(formData)
+  }, [formData])
 
   return (
     <main className='flex justify-center items-center w-full min-h-[100dvh] py-10'>
@@ -72,19 +90,25 @@ const RegisterPage = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {currentStep === 1 && <Step1 register={register} errors={errors} />}
-          {currentStep === 2 && <Step2 register={register} errors={errors} />}
+        <form onSubmit={formStep2.handleSubmit(onSubmit)}>
+          {currentStep === 1 && (
+            <Step1
+              register={formStep1.register}
+              errors={formStep1.formState.errors}
+            />
+          )}
+          {currentStep === 2 && (
+            <Step2
+              register={formStep2.register}
+              errors={formStep2.formState.errors}
+            />
+          )}
 
           {currentStep === 1 && (
             <Button
               type='button'
               variant='flex items-center justify-center gap-x-2 bg-[#3E5899] w-full py-3 border-2 border-[#3E5899] rounded-xl text-white mt-5 font-bold'
-              onClick={() => {
-                handleSubmit(() => {
-                  next()
-                })()
-              }}
+              onClick={formStep1.handleSubmit(next)}
             >
               <p>Next</p>
               <MoveRight />

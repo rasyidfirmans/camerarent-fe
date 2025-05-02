@@ -1,11 +1,11 @@
 import { FieldErrors, UseFormRegister } from 'react-hook-form'
 
-import { RegisterFormSchema } from '@/utils/AuthSchema'
+import { RegisterFormStep2Schema } from '@/utils/AuthSchema'
 import { z } from 'zod'
 import { Eye, EyeClosed } from 'lucide-react'
 import React from 'react'
 
-type RegisterFormData = z.infer<typeof RegisterFormSchema>
+type RegisterFormData = z.infer<typeof RegisterFormStep2Schema>
 
 const Step2 = ({
   register,

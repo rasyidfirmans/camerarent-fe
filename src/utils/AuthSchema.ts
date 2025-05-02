@@ -1,13 +1,7 @@
 import { z } from 'zod'
 
-const RegisterFormSchema = z.object({
+const RegisterFormStep1Schema = z.object({
   fullname: z.string().min(1, { message: 'Name is required' }),
-  username: z.string().min(1, { message: 'Username is required' }),
-  password: z.string().min(1, { message: 'Password is required' }),
-  email: z
-    .string()
-    .min(1, { message: 'Email is required' })
-    .email({ message: 'Invalid email address' }),
   phone: z.string().min(1, { message: 'Phone is required' }),
   citizenship: z
     .any()
@@ -16,9 +10,27 @@ const RegisterFormSchema = z.object({
     }),
 })
 
+const RegisterFormStep2Schema = z.object({
+  username: z.string().min(1, { message: 'Username is required' }),
+  password: z.string().min(1, { message: 'Password is required' }),
+  email: z
+    .string()
+    .min(1, { message: 'Email is required' })
+    .email({ message: 'Invalid email address' }),
+})
+
 const LoginFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
   password: z.string().min(1, { message: 'Password is required' }),
 })
 
-export { RegisterFormSchema, LoginFormSchema }
+const RegisterFormSchema = RegisterFormStep1Schema.merge(
+  RegisterFormStep2Schema
+)
+
+export {
+  RegisterFormSchema,
+  RegisterFormStep1Schema,
+  RegisterFormStep2Schema,
+  LoginFormSchema,
+}
