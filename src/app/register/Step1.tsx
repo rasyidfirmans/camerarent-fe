@@ -19,58 +19,56 @@ const Step1 = ({
         <input
           type='text'
           id='fullname'
-          {...register('fullname')}
+          {...register('name')}
           placeholder='Enter your fullname'
           className={`text-sm w-full py-3 px-3 rounded-lg border ${
-            errors.fullname
+            errors.name
               ? 'border-red-600 focus:outline focus:outline-red-600 placeholder:text-red-600'
               : 'not-focus:border-gray-400 focus:border-[#92A5D3] focus:outline focus:outline-[#92A5D3]'
           }`}
         />
       </label>
-      {errors.fullname && (
-        <p className='text-red-600 text-sm mb-2 mt-1'>
-          {errors.fullname?.message}
-        </p>
+      {errors.name && (
+        <p className='text-red-600 text-sm mb-2 mt-1'>{errors.name?.message}</p>
       )}
 
-      <label htmlFor='phone' className='mt-3 block'>
+      <label htmlFor='phone_number' className='mt-3 block'>
         <span className='block mb-1'>Phone Number</span>
         <input
           type='text'
-          id='phone'
-          {...register('phone')}
+          id='phone_number'
+          {...register('phone_number')}
           placeholder='Enter your phone'
           className={`text-sm w-full py-3 px-3 rounded-lg border ${
-            errors.phone
+            errors.phone_number
               ? 'border-red-600 focus:outline focus:outline-red-600 placeholder:text-red-600'
               : 'not-focus:border-gray-400 focus:border-[#92A5D3] focus:outline focus:outline-[#92A5D3]'
           }`}
         />
       </label>
-      {errors.phone && (
+      {errors.phone_number && (
         <p className='text-red-600 text-sm mb-2 mt-1'>
-          {errors.phone?.message}
+          {errors.phone_number?.message}
         </p>
       )}
 
-      <label htmlFor='citizenship' className='mt-3 block'>
-        <span className='block mb-1'>Citizenship</span>
+      <label htmlFor='citizenship_image' className='mt-3 block'>
+        <span className='block mb-1'>Citizenship Image</span>
         <input
           type='file'
-          id='citizenship'
-          {...register('citizenship')}
+          id='citizenship_image'
+          {...register('citizenship_image')}
           className={`text-sm w-full py-3 px-3 rounded-lg border ${
-            errors.citizenship
+            errors.citizenship_image
               ? 'border-red-600 focus:outline focus:outline-red-600 placeholder:text-red-600'
               : 'not-focus:border-gray-400 focus:border-[#92A5D3] focus:outline focus:outline-[#92A5D3]'
           }`}
         />
       </label>
-      {errors.citizenship && (
+      {errors.citizenship_image && (
         <p className='text-red-600 text-sm mb-2 mt-1'>
-          {typeof errors.citizenship?.message === 'string'
-            ? errors.citizenship.message
+          {typeof errors.citizenship_image?.message === 'string'
+            ? errors.citizenship_image.message
             : ''}
         </p>
       )}

@@ -7,7 +7,7 @@ import {
 } from '@/utils/AuthSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import Step1 from './Step1'
@@ -15,6 +15,9 @@ import Step2 from './Step2'
 import Image from 'next/image'
 import ProgressBar from '@/components/ProgressBar'
 import { MoveLeft, MoveRight } from 'lucide-react'
+import { registerAction } from './actions'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 type RegisterFormStep1 = z.infer<typeof RegisterFormStep1Schema>
 type RegisterFormStep2 = z.infer<typeof RegisterFormStep2Schema>
@@ -32,26 +35,45 @@ const steps = [
 
 const RegisterPage = () => {
   const [currentStep, setCurrentStep] = React.useState(1)
-  const [formData, setFormData] = React.useState<
-    RegisterFormStep1 | RegisterFormStep2
-  >()
+  const [formDataStep1, setFormDataStep1] = React.useState<RegisterFormStep1>({
+    name: '',
+    phone_number: '',
+    citizenship_image: undefined,
+  })
   const formStep1 = useForm<RegisterFormStep1>({
     resolver: zodResolver(RegisterFormStep1Schema),
   })
   const formStep2 = useForm<RegisterFormStep2>({
     resolver: zodResolver(RegisterFormStep2Schema),
   })
+  const router = useRouter()
 
-  const onSubmit = (data: RegisterFormStep2) => {
-    const finalData = {
-      ...formData,
+  const onSubmit = async (data: RegisterFormStep2) => {
+    const finalData: RegisterFormStep1 & RegisterFormStep2 = {
+      ...formDataStep1,
       ...data,
     }
-    setFormData(finalData)
+
+    if (finalData.citizenship_image instanceof FileList) {
+      finalData.citizenship_image = finalData.citizenship_image[0]
+    }
+
+    const registerStatus = await registerAction(finalData)
+
+    if (registerStatus.status) {
+      toast.success('Login successful', {
+        description: `${registerStatus.message}`,
+      })
+      router.push('/login')
+    } else {
+      toast.error('Login failed', {
+        description: `${registerStatus.message}`,
+      })
+    }
   }
 
   const next = (data: RegisterFormStep1) => {
-    setFormData(data)
+    setFormDataStep1(data)
 
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
@@ -63,10 +85,6 @@ const RegisterPage = () => {
       setCurrentStep(currentStep - 1)
     }
   }
-
-  useEffect(() => {
-    console.log(formData)
-  }, [formData])
 
   return (
     <main className='flex justify-center items-center w-full min-h-[100dvh] py-10'>
@@ -107,7 +125,11 @@ const RegisterPage = () => {
           {currentStep === 1 && (
             <Button
               type='button'
-              variant='flex items-center justify-center gap-x-2 bg-[#3E5899] w-full py-3 border-2 border-[#3E5899] rounded-xl text-white mt-5 font-bold'
+              variant={`flex items-center justify-center gap-x-2 bg-primary-blue w-full py-3 border-2 border-primary-blue rounded-xl text-white mt-5 font-bold ${
+                formStep1.formState.isDirty && formStep1.formState.isValid
+                  ? 'hover:bg-secondary-blue hover:border-secondary-blue'
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
               onClick={formStep1.handleSubmit(next)}
             >
               <p>Next</p>
@@ -119,13 +141,43 @@ const RegisterPage = () => {
             <>
               <Button
                 type='submit'
-                variant='bg-[#3E5899] w-full py-3 border-2 border-[#3E5899] rounded-xl text-white mt-5 font-bold'
+                variant={`flex items-center justify-center gap-x-2 bg-primary-blue w-full py-3 border-2 border-primary-blue rounded-xl text-white mt-5 font-bold ${
+                  formStep2.formState.isDirty && formStep2.formState.isValid
+                    ? 'hover:bg-secondary-blue hover:border-secondary-blue'
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
               >
-                Register
+                {formStep2.formState.isSubmitting ? (
+                  <div className='flex items-center justify-center w-full'>
+                    <svg
+                      className='mr-3 -ml-1 size-5 animate-spin text-white'
+                      xmlns='http://www.w3.org/2000/svg'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='4'
+                      ></circle>
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                      ></path>
+                    </svg>
+                    <p>Register</p>
+                  </div>
+                ) : (
+                  <p>Register</p>
+                )}
               </Button>
               <Button
                 type='button'
-                variant='flex items-center justify-center gap-x-2 bg-transparent text-[#3E5899] w-full py-3 border-2 border-[#3E5899] rounded-xl mt-5 font-bold'
+                variant='flex items-center justify-center gap-x-2 bg-transparent text-primary-blue w-full py-3 border-2 border-primary-blue rounded-xl mt-5 font-bold'
                 onClick={prev}
               >
                 <MoveLeft />
