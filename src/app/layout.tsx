@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Footer from "../components/Footer";
+import ProductCard from "../components/ProductCard";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,6 +30,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <ProductCard
+          product={{
+            id: "1",
+            name: "Kamera",
+            price: 999000,
+            image: "/images/test-foto.jpg",
+          }}
+          type={"available"}
+        />
+        <Footer />
       </body>
     </html>
   );
