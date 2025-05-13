@@ -1,6 +1,6 @@
 import { FieldErrors, UseFormRegister } from 'react-hook-form'
 
-import { RegisterFormStep2Schema } from '@/utils/AuthSchema'
+import { RegisterFormStep2Schema } from '@/lib/authSchema'
 import { z } from 'zod'
 import { Eye, EyeClosed } from 'lucide-react'
 import React from 'react'

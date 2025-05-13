@@ -1,55 +1,69 @@
 'use server'
 
-import { LoginFormSchema } from '@/utils/AuthSchema'
+import { apiFetch } from '@/lib/apiClient'
+import { LoginFormSchema } from '@/lib/authSchema'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 
 type LoginFormData = z.infer<typeof LoginFormSchema>
 
 const loginAction = async (loginData: LoginFormData) => {
-  const fetcher = async (url: string, loginData: LoginFormData) =>
-    await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(loginData),
-    })
-
   try {
-    const response = await fetcher(
+    const response = await apiFetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/login`,
-      loginData
+      {
+        method: 'POST',
+        body: {
+          username: loginData.username,
+          password: loginData.password,
+        },
+        headers: {
+          Accept: 'application/json',
+        },
+      }
     )
-    if (!response.ok) {
-      const errorData = await response.json()
-      return { status: false, message: errorData.message }
+
+    const parsedResponse = response as {
+      code: number
+      message: string
+      access_token: string
+      refresh_token: string
     }
 
-    const { access_token, refresh_token } = await response.json()
+    if (parsedResponse.code !== 200) {
+      return {
+        status: false,
+        message: parsedResponse.message,
+      }
+    }
 
-    // Creating cookies for storing token
     const cookieStore = await cookies()
-    cookieStore.set('access_token', access_token, {
+
+    cookieStore.set('access_token', parsedResponse.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
       path: '/',
+      sameSite: 'strict',
       maxAge: 60 * 60,
     })
-    cookieStore.set('refresh_token', refresh_token, {
+    cookieStore.set('refresh_token', parsedResponse.refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 30,
     })
 
-    return { status: true, message: 'Login successful' }
+    return {
+      status: true,
+      message: parsedResponse.message,
+    }
   } catch (error) {
-    console.error('Error:', error)
-    return { status: false, message: 'Login failed' }
+    console.error('Login error:', error)
+    return {
+      status: false,
+      message: 'Login failed',
+    }
   }
 }
 

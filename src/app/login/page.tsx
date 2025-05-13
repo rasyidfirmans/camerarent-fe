@@ -1,17 +1,17 @@
 'use client'
 
 import Button from '@/components/Button'
-import { LoginFormSchema } from '@/utils/AuthSchema'
+import { LoginFormSchema } from '@/lib/authSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeClosed } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import { loginAction } from './actions'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 type LoginFormData = z.infer<typeof LoginFormSchema>
 
@@ -26,6 +26,7 @@ const LoginPage = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     const loginStatus = await loginAction(data)
+
     if (loginStatus.status) {
       toast.success('Login successful', {
         description: `${loginStatus.message}`,
