@@ -4,7 +4,7 @@ import Button from '@/components/Button'
 import {
   RegisterFormStep2Schema,
   RegisterFormStep1Schema,
-} from '@/utils/AuthSchema'
+} from '@/lib/authSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import React from 'react'

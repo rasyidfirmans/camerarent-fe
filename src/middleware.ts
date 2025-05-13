@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getRefreshAccessToken } from './lib/getToken'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const publicPaths = ['/login', '/register']
 
   const pathname = request.nextUrl.pathname
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path))
   const isLoggedIn = request.cookies.get('access_token')?.value ? true : false
+
+  if (!isLoggedIn && request.cookies.get('refresh_token')?.value) {
+    return await getRefreshAccessToken(request)
+  }
 
   if (isPublicPath && isLoggedIn) {
     return NextResponse.redirect(new URL('/', request.url))

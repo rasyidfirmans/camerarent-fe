@@ -1,41 +1,52 @@
 'use server'
 
-import { RegisterFormSchema } from '@/utils/AuthSchema'
+import { apiFetch } from '@/lib/apiClient'
+import { RegisterFormSchema } from '@/lib/authSchema'
 import { z } from 'zod'
 
 type RegisterFormData = z.infer<typeof RegisterFormSchema>
 
 const registerAction = async (loginData: RegisterFormData) => {
-  const fetcher = async (url: string, data: RegisterFormData) => {
-    const formData = new FormData()
+  const formData = new FormData()
 
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value as string)
-    })
-
-    return await fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-      },
-      body: formData,
-    })
-  }
+  Object.entries(loginData).forEach(([key, value]) => {
+    formData.append(key, value as string)
+  })
 
   try {
-    const response = await fetcher(
+    const response = await apiFetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/register`,
-      loginData
+      {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Accept: 'application/json',
+        },
+      }
     )
-    if (!response.ok) {
-      const errorData = await response.json()
-      return { status: false, message: errorData.message }
+
+    const parsedResponse = response as {
+      code: number
+      message: string
     }
 
-    return { status: true, message: 'Login successful' }
+    if (parsedResponse.code !== 201) {
+      return {
+        status: false,
+        message: parsedResponse.message,
+      }
+    }
+
+    return {
+      status: true,
+      message: parsedResponse.message,
+    }
   } catch (error) {
-    console.error('Error:', error)
-    return { status: false, message: 'Login failed' }
+    console.error('Register error:', error)
+    return {
+      status: false,
+      message: 'An error occurred during registration.',
+    }
   }
 }
 

@@ -19,7 +19,6 @@ export default function RootLayout({
       <body
         className={`antialiased bg-[url(/images/bg.png)] bg-contain bg-repeat `}
       >
-        {/* ClientLayoutWrapper hanya membungkus children */}
         <LayoutWrapper>{children}</LayoutWrapper>
         <ProductCard
           product={{

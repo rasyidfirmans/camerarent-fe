@@ -1,6 +1,6 @@
 import { FieldErrors, UseFormRegister } from 'react-hook-form'
 
-import { RegisterFormStep1Schema } from '@/utils/AuthSchema'
+import { RegisterFormStep1Schema } from '@/lib/authSchema'
 import { z } from 'zod'
 
 type RegisterFormData = z.infer<typeof RegisterFormStep1Schema>
