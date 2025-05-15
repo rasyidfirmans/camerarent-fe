@@ -3,7 +3,6 @@ import { getRefreshAccessToken } from './lib/getToken'
 
 export async function middleware(request: NextRequest) {
   const publicPaths = ['/', '/login', '/register']
-
   const pathname = request.nextUrl.pathname
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path))
   const isLoggedIn = request.cookies.get('access_token')?.value ? true : false
