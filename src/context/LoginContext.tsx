@@ -35,7 +35,7 @@ const LoginContextProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchUserData = async () => {
       const accessToken = await getCookieAccessToken().then((token) => token)
 
-      const fetchedUserdata = await apiFetch(
+      const fetchedUserdata = (await apiFetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/user`,
         {
           method: 'GET',
@@ -44,12 +44,15 @@ const LoginContextProvider = ({ children }: { children: React.ReactNode }) => {
           },
           token: accessToken ? accessToken : undefined,
         }
-      )
+      )) as { code: number; data: { name: string; email: string } }
 
-      setIsLoggedIn(true)
-      setUserData(
-        (fetchedUserdata as { data: { name: string; email: string } }).data
-      )
+      if (fetchedUserdata.code === 200) {
+        setIsLoggedIn(true)
+        setUserData({
+          name: fetchedUserdata.data.name,
+          email: fetchedUserdata.data.email,
+        })
+      }
     }
 
     fetchUserData()

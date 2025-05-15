@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,6 +11,7 @@
   --font-mono: var(--font-geist-mono);
   --color-primary-blue: #2c3f6d;
   --color-primary-yellow: #da9920;
+  --color-secondary-yellow: #f6b93b;
   --color-secondary-blue: #212f52;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
