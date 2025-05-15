@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getRefreshAccessToken } from './lib/getToken'
 
 export async function middleware(request: NextRequest) {
-  const publicPaths = ['/login', '/register']
-
+  const publicPaths = ['/', '/login', '/register']
   const pathname = request.nextUrl.pathname
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path))
   const isLoggedIn = request.cookies.get('access_token')?.value ? true : false
@@ -12,9 +11,9 @@ export async function middleware(request: NextRequest) {
     return await getRefreshAccessToken(request)
   }
 
-  if (isPublicPath && isLoggedIn) {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
+  // if (isPublicPath && isLoggedIn) {
+  //   return NextResponse.redirect(new URL('/', request.url))
+  // }
 
   if (!isPublicPath && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', request.url))

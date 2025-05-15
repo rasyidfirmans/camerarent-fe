@@ -13,19 +13,24 @@ export async function apiFetch<TResponse, TBody = unknown>(
 ): Promise<TResponse> {
   const { method = 'GET', body, headers = {}, token } = options || {}
 
-  const res = await fetch(url, {
-    method,
-    headers: {
-      ...(body instanceof FormData
-        ? {}
-        : { 'Content-Type': 'application/json' }),
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...headers,
-    },
-    ...(body && {
-      body: body instanceof FormData ? body : JSON.stringify(body),
-    }),
-  })
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        ...(body instanceof FormData
+          ? {}
+          : { 'Content-Type': 'application/json' }),
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...headers,
+      },
+      ...(body && {
+        body: body instanceof FormData ? body : JSON.stringify(body),
+      }),
+    })
 
-  return res.json()
+    return res.json()
+  } catch (error) {
+    console.error('Error in apiFetch:', error)
+    throw error
+  }
 }
