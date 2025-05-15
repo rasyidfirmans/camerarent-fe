@@ -1,8 +1,6 @@
+import LayoutWrapper from '@/components/LayoutWrapper'
 import type { Metadata } from 'next'
 import './globals.css'
-import LayoutWrapper from '@/components/LayoutWrapper'
-import Footer from '../components/Footer'
-import ProductCard from '../components/ProductCard'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -20,16 +18,6 @@ export default function RootLayout({
         className={`antialiased bg-[url(/images/bg.png)] bg-contain bg-repeat `}
       >
         <LayoutWrapper>{children}</LayoutWrapper>
-        <ProductCard
-          product={{
-            id: '1',
-            name: 'Kamera',
-            price: 999000,
-            image: '/images/test-foto.jpg',
-          }}
-          type={'available'}
-        />
-        <Footer />
       </body>
     </html>
   )
