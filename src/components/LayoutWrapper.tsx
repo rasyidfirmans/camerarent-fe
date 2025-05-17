@@ -3,8 +3,6 @@ import { LoginContextProvider } from '@/context/LoginContext'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 import { Toaster } from 'sonner'
-import Footer from './Footer'
-import Navbar from './Navbar'
 
 const excludePaths = ['/login', '/register']
 
@@ -17,11 +15,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
       {isExcludedPath ? (
         children
       ) : (
-        <LoginContextProvider>
-          {!isExcludedPath && <Navbar />}
-          {children}
-          {!isExcludedPath && <Footer />}
-        </LoginContextProvider>
+        <LoginContextProvider>{children}</LoginContextProvider>
       )}
       <Toaster richColors position='bottom-right' closeButton={false} />
     </>

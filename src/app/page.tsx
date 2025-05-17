@@ -7,8 +7,8 @@ export default function Home() {
   const { isLoggedIn, userData } = React.useContext(LoginContext)
 
   return (
-    <div className='h-[100rem]'>
-      {isLoggedIn && userData && (
+    <div className='h-screen'>
+      {isLoggedIn && (
         <div className='flex flex-col items-center justify-center h-full'>
           <h1 className='text-3xl font-bold'>Welcome, {userData.name}</h1>
           <p className='text-xl'>You are logged in!</p>

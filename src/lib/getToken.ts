@@ -17,7 +17,6 @@ export const getRefreshAccessToken = async (request: NextRequest) => {
   ).then((res) => res)
 
   const accessToken = (newAccessToken as { access_token: string }).access_token
-
   const res = NextResponse.next()
   res.cookies.set('access_token', accessToken, {
     httpOnly: true,
