@@ -1,5 +1,5 @@
 import { LoginContext } from '@/context/LoginContext'
-import useMediaQuery from '@/hooks/useMediaQuery'
+import handleLogout from '@/lib/handleLogout'
 import {
   ChevronDown,
   LogOut,
@@ -9,10 +9,9 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef } from 'react'
 import Button from './Button'
-import handleLogout from '@/lib/handleLogout'
-import { useRouter } from 'next/navigation'
 
 const menuList = [
   {
@@ -37,9 +36,6 @@ const Navbar = () => {
   const { isLoggedIn, setIsLoggedIn, userData } = React.useContext(LoginContext)
   const router = useRouter()
   const nav = useRef<HTMLDivElement>(null)
-  const isMobile = useMediaQuery('(max-width: 768px)')
-
-  console.log('isLoggedIn', isLoggedIn)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,36 +94,34 @@ const Navbar = () => {
           </div>
         </Link>
       </div>
-
-      {isMobile ? (
-        <div
-          className={`w-[25px] h-[20px] relative cursor-pointer flex flex-col justify-between ${
-            active ? 'active' : ''
+      <div
+        className={`md:hidden w-[25px] h-[20px] relative cursor-pointer flex flex-col justify-between ${
+          active ? 'active' : ''
+        }`}
+        onClick={() => setActive(!active)}
+      >
+        <span
+          className={`block h-[3px] bg-primary-blue rounded-lg transition ease-in-out duration-300 ${
+            active ? 'translate-y-[9px] rotate-45' : ''
           }`}
-          onClick={() => setActive(!active)}
-        >
-          <span
-            className={`block h-[3px] bg-primary-blue rounded-lg transition ease-in-out duration-300 ${
-              active ? 'translate-y-[9px] rotate-45' : ''
-            }`}
-          ></span>
-          <span
-            className={`block h-[3px] bg-primary-blue rounded-lg transition ease-in-out duration-300 ${
-              active ? 'opacity-0' : ''
-            }`}
-          ></span>
-          <span
-            className={`block h-[3px] bg-primary-blue rounded-lg transition ease-in-out duration-300 ${
-              active ? '-translate-y-[9px] -rotate-45' : ''
-            }`}
-          ></span>
-        </div>
-      ) : isLoggedIn ? (
+        ></span>
+        <span
+          className={`block h-[3px] bg-primary-blue rounded-lg transition ease-in-out duration-300 ${
+            active ? 'opacity-0' : ''
+          }`}
+        ></span>
+        <span
+          className={`block h-[3px] bg-primary-blue rounded-lg transition ease-in-out duration-300 ${
+            active ? '-translate-y-[9px] -rotate-45' : ''
+          }`}
+        ></span>
+      </div>
+      {isLoggedIn ? (
         <div
           onClick={() => {
             setActive(!active)
           }}
-          className='flex items-center gap-x-3 pr-3 rounded-full cursor-pointer hover:bg-yellow-100 transition ease-in-out duration-200'
+          className='hidden md:flex items-center gap-x-3 pr-3 rounded-full cursor-pointer hover:bg-yellow-100 transition ease-in-out duration-200'
         >
           <div className='bg-primary-yellow size-10 rounded-full flex items-center justify-center text-white font-bold'>
             {userData.name.slice(0, 1)}
@@ -144,7 +138,7 @@ const Navbar = () => {
           </div>
         </div>
       ) : (
-        <div className='flex gap-x-3'>
+        <div className='hidden md:flex gap-x-3'>
           <Link href='/login'>
             <Button
               type='button'
@@ -163,7 +157,6 @@ const Navbar = () => {
           </Link>
         </div>
       )}
-
       {active && (
         <div className='w-[18rem] bg-white p-8 shadow-lg rounded-xl absolute top-18 md:top-20 right-5 md:right-16 z-10'>
           <div className='flex items-center gap-x-3 border-b-1 border-b-gray-600 pb-5'>
