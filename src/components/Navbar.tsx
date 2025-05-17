@@ -1,7 +1,12 @@
 import { LoginContext } from '@/context/LoginContext'
 import useMediaQuery from '@/hooks/useMediaQuery'
-import PersonIcon from '@mui/icons-material/Person' // Adjust the import path based on your library or component location
-import { ChevronDown, LogOut, ScanLine, ShoppingCart } from 'lucide-react'
+import {
+  ChevronDown,
+  LogOut,
+  ScanLine,
+  ShoppingCart,
+  UserRound,
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef } from 'react'
@@ -41,16 +46,16 @@ const Navbar = () => {
       if (nav.current) {
         if (window.scrollY > 0) {
           nav.current.classList.add(
-            'bg-white/10',
-            'backdrop-blur-sm',
+            'bg-white/75',
+            'backdrop-blur-lg',
             'shadow-md'
           )
           nav.current.classList.remove('bg-transparent')
         } else {
           nav.current.classList.add('bg-transparent')
           nav.current.classList.remove(
-            'bg-white/10',
-            'backdrop-blur-sm',
+            'bg-white/75',
+            'backdrop-blur-lg',
             'shadow-md'
           )
         }
@@ -75,7 +80,7 @@ const Navbar = () => {
   return (
     <nav
       ref={nav}
-      className='fixed w-full px-8 md:px-16 py-3 flex justify-between items-center'
+      className='fixed z-40 top-0 w-full h-20 px-8 md:px-16 flex justify-between items-center'
     >
       <div className='cursor-pointer'>
         <Link href='/' className='flex items-center gap-x-2 '>
@@ -163,7 +168,7 @@ const Navbar = () => {
         <div className='w-[18rem] bg-white p-8 shadow-lg rounded-xl absolute top-18 md:top-20 right-5 md:right-16 z-10'>
           <div className='flex items-center gap-x-3 border-b-1 border-b-gray-600 pb-5'>
             <div className='bg-gray-300 w-12 h-12 rounded-full flex items-center justify-center'>
-              <PersonIcon sx={{ color: '#6A7282' }} fontSize='large' />
+              <UserRound />
             </div>
             {isLoggedIn ? (
               <div>

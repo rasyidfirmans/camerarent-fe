@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <div className='Footer bg-secondary-blue flex justify-between items-center text-white border-t border-blue-light w-full py-8 px-16'>
+    <div className='Footer bg-secondary-blue flex justify-between items-center text-white border-t border-blue-light w-full py-6 px-16'>
       <p className='text-md p-2'>© 2025 Camerarent. All rights reserved.</p>
       <div className='flex flex-row items-center gap-x-8 p-2'>
         <a
