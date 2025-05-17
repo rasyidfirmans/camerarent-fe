@@ -80,7 +80,7 @@ const Navbar = () => {
   return (
     <nav
       ref={nav}
-      className='fixed z-40 top-0 w-full h-20 px-8 md:px-16 flex justify-between items-center'
+      className='fixed z-40 top-0 w-full h-20 px-5 md:px-16 flex justify-between items-center'
     >
       <div className='cursor-pointer'>
         <Link href='/' className='flex items-center gap-x-2 '>
