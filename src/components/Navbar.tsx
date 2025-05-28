@@ -39,8 +39,6 @@ const Navbar = () => {
   const nav = useRef<HTMLDivElement>(null)
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  console.log('isLoggedIn', isLoggedIn)
-
   useEffect(() => {
     const handleScroll = () => {
       if (nav.current) {
