@@ -11,10 +11,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'http',
         hostname: 'laravel.local',
-        port: '',
-        pathname: '/storage/images/products/**',
       },
     ],
+  },
+  allowedDevOrigins: ['local-origin.dev', '*.local-origin.dev'],
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 }
 
