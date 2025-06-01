@@ -6,6 +6,16 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '3mb',
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'laravel.local',
+        port: '',
+        pathname: '/storage/images/products/**',
+      },
+    ],
+  },
 }
 
 export default nextConfig
