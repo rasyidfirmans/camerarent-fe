@@ -40,17 +40,6 @@ const ProductDetails = (props: ProductDetailProps) => {
               <Shapes />
               <span>Category: {product.category}</span>
             </div>
-            {/* <div className='flex items-center gap-x-3'>
-              <BadgeDollarSign />
-              <span>
-                Price:{' '}
-                {Number(100000).toLocaleString('id-ID', {
-                  style: 'currency',
-                  currency: 'IDR',
-                })}
-                {'/day'}
-              </span>
-            </div> */}
           </div>
         </div>
         <div>
