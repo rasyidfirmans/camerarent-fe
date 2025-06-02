@@ -15,9 +15,6 @@ type ProductDetailsProps = {
 const ProductDetailsSection = (props: ProductDetailsProps) => {
   const { product } = props
 
-  // Debugging log to ensure product is passed correctly
-  console.log('ProductDetailsSection product:', product)
-
   return (
     <section className='w-full lg:w-1/2 xl:w-2/3 h-full flex flex-col gap-y-5 xl:flex-row xl:gap-x-5 border border-slate-300 bg-white/20 backdrop-blur-md p-5 rounded-xl shadow-xl'>
       <div className='w-full h-fit xl:h-full xl:w-3/5 rounded-xl bg-white border border-slate-300 overflow-hidden flex justify-center items-center'>

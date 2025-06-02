@@ -38,8 +38,6 @@ const ProductPage = () => {
     enabled: !!productId.id,
   })
 
-  console.log(product)
-
   if (isError) {
     console.error(error)
     toast.error('Upss! Something went wrong')
@@ -50,7 +48,7 @@ const ProductPage = () => {
       {!isLoading && !isError && product && (
         <>
           <ProductDetailsSection product={product.data} />
-          <RentDetails />
+          <RentDetails price={product.data.price} />
         </>
       )}
     </main>
