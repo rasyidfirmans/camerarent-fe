@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import LayoutWrapper from '@/components/LayoutWrapper'
+import QueryProviders from '@/components/QueryProviders'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -17,7 +18,9 @@ export default function RootLayout({
       <body
         className={`antialiased bg-[url(/images/bg.png)] bg-contain bg-repeat `}
       >
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <QueryProviders>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </QueryProviders>
       </body>
     </html>
   )
