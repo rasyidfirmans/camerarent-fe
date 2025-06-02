@@ -1,4 +1,4 @@
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 type FetchOptions<TBody> = {
   method?: HttpMethod
@@ -33,4 +33,17 @@ export async function apiFetch<TResponse, TBody = unknown>(
     console.error('Error in apiFetch:', error)
     throw error
   }
+}
+
+export const api = {
+  get: <TResponse>(url: string, options?: FetchOptions<any>) =>
+    apiFetch<TResponse>(url, { method: 'GET', ...options }),
+  post: <TResponse>(url: string, options?: FetchOptions<any>) =>
+    apiFetch<TResponse>(url, { method: 'POST', ...options }),
+  put: <TResponse>(url: string, options?: FetchOptions<any>) =>
+    apiFetch<TResponse>(url, { method: 'PUT', ...options }),
+  delete: <TResponse>(url: string, options?: FetchOptions<any>) =>
+    apiFetch<TResponse>(url, { method: 'DELETE', ...options }),
+  patch: <TResponse>(url: string, options?: FetchOptions<any>) =>
+    apiFetch<TResponse>(url, { method: 'PATCH', ...options }),
 }
