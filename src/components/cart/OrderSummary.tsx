@@ -1,6 +1,12 @@
 import { MoveRight } from 'lucide-react'
+import { ApiResponseCart } from './CartBody'
 
-const OrderSummary = () => {
+type OrderSummaryProps = {
+  data: ApiResponseCart
+}
+
+const OrderSummary = (props: OrderSummaryProps) => {
+  const { data } = props
   return (
     <section className='w-full sm:w-3/4 lg:w-2/5 p-2 sm:p-5 border border-gray-600 rounded-xl bg-primary-blue/10 backdrop-blur-xs shadow-lg'>
       <div className='relative w-full h-full overflow-y-auto flex flex-col bg-white rounded-xl p-5'>
@@ -11,7 +17,7 @@ const OrderSummary = () => {
           <div className='flex justify-between'>
             <p className='text-sm md:text-base'>Subtotal</p>
             <p className='text-sm md:text-base font-bold'>
-              {Number(2000000).toLocaleString('id-ID', {
+              {data?.total_price?.toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
@@ -21,7 +27,7 @@ const OrderSummary = () => {
           <div className='flex justify-between mt-3'>
             <p className='text-sm md:text-base'>Discount</p>
             <p className='text-red-600 text-sm md:text-base font-bold'>
-              {Number(100000).toLocaleString('id-ID', {
+              {Number(0).toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
@@ -34,7 +40,7 @@ const OrderSummary = () => {
           <div className='flex justify-between mt-5 font-bold'>
             <p className='text-sm md:text-base'>Total</p>
             <p className='text-sm md:text-base'>
-              {Number(1900000).toLocaleString('id-ID', {
+              {data?.total_price?.toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
