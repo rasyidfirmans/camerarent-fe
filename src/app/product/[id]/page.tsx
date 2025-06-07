@@ -48,7 +48,9 @@ const ProductPage = () => {
       {!isLoading && !isError && product && (
         <>
           <ProductDetailsSection product={product.data} />
-          <RentDetails price={product.data.price} />
+          <RentDetails
+            product={{ product_id: product.data.id, price: product.data.price }}
+          />
         </>
       )}
     </main>

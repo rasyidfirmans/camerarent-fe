@@ -1,8 +1,13 @@
 'use client'
 
+import { LoginContext } from '@/context/LoginContext'
+import { api } from '@/lib/apiClient'
+import { getCookieAccessToken } from '@/lib/getToken'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Minus, Plus, ShoppingCart } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useContext, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -67,10 +72,32 @@ const RentFormSchema = z
     }
   })
 
-const RentDetails = ({ price }: { price: number | string }) => {
+type RentDetailProps = {
+  product: { product_id: number; price: number | string }
+}
+
+const toMysqlDatetime = (isoString) => {
+  const date = new Date(isoString)
+
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const hours = String(date.getUTCHours()).padStart(2, '0')
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+  const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+const RentDetails = (props: RentDetailProps) => {
+  const { product } = props
+
   const [quantity, setQuantity] = useState<number>(1)
   const rentPeriodRef = useRef<HTMLParagraphElement>(null)
   const subTotalRef = useRef<HTMLParagraphElement>(null)
+  const { isLoggedIn } = useContext(LoginContext)
+  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const {
     register,
@@ -85,15 +112,66 @@ const RentDetails = ({ price }: { price: number | string }) => {
   })
   const rentFormFields = watch()
 
+  const cartMutation = async (rentData: {
+    start_date: string
+    end_date: string
+    quantity: number
+  }) => {
+    try {
+      const accessToken = await getCookieAccessToken()
+      const res = await api.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/cart`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: {
+            product_id: product.product_id,
+            ...rentData,
+          },
+        }
+      )
+
+      return res
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+      throw new Error('Failed to add to cart')
+    }
+  }
+
+  const mutation = useMutation({
+    mutationFn: (rentData: {
+      start_date: string
+      end_date: string
+      quantity: number
+    }) => cartMutation(rentData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['get_cart'] })
+    },
+  })
+
   const onSubmit = (data: z.infer<typeof RentFormSchema>) => {
-    console.log('Form submitted:', data)
+    const endDate = toMysqlDatetime(data.end_date.toISOString())
+    const startDate = toMysqlDatetime(data.start_date.toISOString())
+    const convertedData = {
+      ...data,
+      start_date: startDate,
+      end_date: endDate,
+    }
+
+    if (!isLoggedIn) {
+      router.push('/login')
+    } else {
+      mutation.mutate(convertedData)
+      router.push('/cart')
+    }
   }
 
   const decrement = () => {
     if (quantity > 1) {
       setQuantity((prevQuantity) => {
         const currQuantity = prevQuantity - 1
-        calculateSubTotal(price, currQuantity)
+        calculateSubTotal(product.price, currQuantity)
         return currQuantity
       })
       setValue('quantity', quantity - 1)
@@ -103,7 +181,7 @@ const RentDetails = ({ price }: { price: number | string }) => {
   const increment = () => {
     setQuantity((prevQuantity) => {
       const currQuantity = prevQuantity + 1
-      calculateSubTotal(price, currQuantity)
+      calculateSubTotal(product.price, currQuantity)
       return currQuantity
     })
     setValue('quantity', quantity + 1)
@@ -130,11 +208,14 @@ const RentDetails = ({ price }: { price: number | string }) => {
   }
 
   const calculateSubTotal = (price: number | string, quantity: number) => {
-    price = typeof price === 'string' ? parseFloat(price) : price
+    product.price =
+      typeof product.price === 'string'
+        ? parseFloat(product.price)
+        : product.price
     const diffDays = calculateRentPeriod()
 
     if (diffDays) {
-      const subTotal = price * quantity * diffDays
+      const subTotal = product.price * quantity * diffDays
       if (subTotalRef.current) {
         subTotalRef.current.innerHTML = subTotal.toLocaleString('id-ID', {
           style: 'currency',
@@ -170,7 +251,7 @@ const RentDetails = ({ price }: { price: number | string }) => {
               }`}
               onBlur={() => {
                 calculateRentPeriod()
-                calculateSubTotal(price, quantity)
+                calculateSubTotal(product.price, quantity)
               }}
             />
             <p
@@ -197,7 +278,7 @@ const RentDetails = ({ price }: { price: number | string }) => {
               }`}
               onBlur={() => {
                 calculateRentPeriod()
-                calculateSubTotal(price, quantity)
+                calculateSubTotal(product.price, quantity)
               }}
             />
             <p
@@ -248,9 +329,9 @@ const RentDetails = ({ price }: { price: number | string }) => {
               )}
             </div>
             <div className='w-full flex items-center justify-between'>
-              <p>Price</p>
+              <p>product.price</p>
               <p className='font-bold'>
-                {Number(price).toLocaleString('id-ID', {
+                {Number(product.price).toLocaleString('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
                 })}
