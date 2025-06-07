@@ -1,13 +1,15 @@
 import { ScanLine } from 'lucide-react'
 import Image from 'next/image'
+import { ApiResponseCart } from '../cart/CartBody'
 
 type PaymentFormProps = {
   label: string
   style?: string
+  data: ApiResponseCart
 }
 
 const PaymentForm = (props: PaymentFormProps) => {
-  const { label, style } = props
+  const { label, style, data } = props
   return (
     <section className={`${style} `}>
       <div className='w-full h-full bg-white rounded-xl p-5 overflow-y-auto'>
@@ -16,7 +18,7 @@ const PaymentForm = (props: PaymentFormProps) => {
           <div className='flex justify-between'>
             <p className='text-sm md:text-base'>Subtotal</p>
             <p className='text-sm md:text-base font-bold'>
-              {Number(2000000).toLocaleString('id-ID', {
+              {data?.total_price?.toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
@@ -26,7 +28,7 @@ const PaymentForm = (props: PaymentFormProps) => {
           <div className='flex justify-between mt-3'>
             <p className='text-sm md:text-base'>Discount</p>
             <p className='text-red-600 text-sm md:text-base font-bold'>
-              {Number(100000).toLocaleString('id-ID', {
+              {Number(0).toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
@@ -36,7 +38,7 @@ const PaymentForm = (props: PaymentFormProps) => {
           <div className='flex justify-between mt-5 font-bold'>
             <p className='text-sm md:text-base'>Total</p>
             <p className='text-sm md:text-base'>
-              {Number(1900000).toLocaleString('id-ID', {
+              {data?.total_price?.toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,

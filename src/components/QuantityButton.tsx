@@ -1,3 +1,5 @@
+'use client'
+
 import { api } from '@/lib/apiClient'
 import { getCookieAccessToken } from '@/lib/getToken'
 import { useMutation } from '@tanstack/react-query'

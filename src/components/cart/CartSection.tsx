@@ -3,12 +3,14 @@ import { ApiResponseCart } from './CartBody'
 import CartItem from './CartItem'
 
 export type CartSectionProps = {
+  label: string
+  style?: string
   data: ApiResponseCart
   setCartData: React.Dispatch<React.SetStateAction<ApiResponseCart>>
 }
 
 const CartSection = (props: CartSectionProps) => {
-  const { data, setCartData } = props
+  const { label, style, data, setCartData } = props
 
   const handleDelete = (index: number) => {
     setCartData((prev) => {
@@ -73,10 +75,15 @@ const CartSection = (props: CartSectionProps) => {
   }
 
   return (
-    <section className='w-full sm:w-3/4 lg:w-3/5 h-[75vh] lg:h-screen p-2 sm:p-5 border border-gray-600 rounded-xl bg-primary-blue/10 backdrop-blur-xs shadow-lg'>
+    <section
+      className={
+        style ||
+        `w-full sm:w-3/4 lg:w-3/5 h-[75vh] lg:h-screen p-2 sm:p-5 border border-gray-600 rounded-xl bg-primary-blue/10 backdrop-blur-xs shadow-lg`
+      }
+    >
       <div className='relative w-full h-full overflow-y-auto flex flex-col gap-y-3 bg-white rounded-xl px-2 pb-2 sm:px-5 sm:pb-5'>
         <p className='w-[calc(100%+1rem)] sm:w-[calc(100%+2.5rem)] bg-white rounded-b-xl font-bold sticky top-0 pt-5 pb-3 px-5 text-lg -mx-2 sm:-mx-5'>
-          Your Cart
+          {label || `Your Cart`}
         </p>
         <div className='w-full flex flex-col gap-y-8'>
           {data?.data?.length > 0 &&
