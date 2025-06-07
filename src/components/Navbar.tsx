@@ -18,12 +18,12 @@ const menuList = [
   {
     name: 'My Cart',
     icon: <ShoppingCart />,
-    path: '/',
+    path: '/cart',
   },
   {
     name: 'Transaction',
     icon: <ScanLine />,
-    path: '/',
+    path: '/transaction',
   },
   {
     name: 'Logout',
@@ -193,7 +193,7 @@ const Navbar = () => {
                 >
                   <Link
                     href={menuItem.path}
-                    onClick={logout}
+                    {...(menuItem.name === 'Logout' ? { onClick: logout } : {})}
                     className='flex items-center gap-x-3'
                   >
                     {menuItem.icon}
