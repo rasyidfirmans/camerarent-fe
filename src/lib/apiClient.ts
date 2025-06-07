@@ -26,6 +26,7 @@ export async function apiFetch<TResponse, TBody = unknown>(
       ...(body && {
         body: body instanceof FormData ? body : JSON.stringify(body),
       }),
+      credentials: 'include',
     })
 
     return res.json()
