@@ -1,4 +1,4 @@
-import { apiFetch } from '@/lib/apiClient'
+import { api } from '@/lib/apiClient'
 import { getCookieAccessToken } from '@/lib/getToken'
 import React, { createContext, useEffect } from 'react'
 
@@ -35,10 +35,9 @@ const LoginContextProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchUserData = async () => {
       const accessToken = await getCookieAccessToken().then((token) => token)
 
-      const fetchedUserdata = (await apiFetch(
+      const fetchedUserdata = (await api.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/user`,
         {
-          method: 'GET',
           headers: {
             Accept: 'application/json',
           },

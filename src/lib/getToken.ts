@@ -1,20 +1,19 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { apiFetch } from './apiClient'
 import { NextRequest, NextResponse } from 'next/server'
+import { api } from './apiClient'
 
 export const getRefreshAccessToken = async (request: NextRequest) => {
-  const newAccessToken = await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/refresh`,
-    {
+  const newAccessToken = await api
+    .get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/refresh`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
       },
       token: request.cookies.get('refresh_token')?.value,
-    }
-  ).then((res) => res)
+    })
+    .then((res) => res)
 
   const accessToken = (newAccessToken as { access_token: string }).access_token
 
