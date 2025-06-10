@@ -1,5 +1,6 @@
 import { MoveRight } from 'lucide-react'
 import { ApiResponseCart } from './CartBody'
+import { useRouter } from 'next/navigation'
 
 type OrderSummaryProps = {
   data: ApiResponseCart
@@ -7,6 +8,7 @@ type OrderSummaryProps = {
 
 const OrderSummary = (props: OrderSummaryProps) => {
   const { data } = props
+  const router = useRouter()
   return (
     <section className='w-full sm:w-3/4 lg:w-2/5 p-2 sm:p-5 border border-gray-600 rounded-xl bg-primary-blue/10 backdrop-blur-xs shadow-lg'>
       <div className='relative w-full h-full overflow-y-auto flex flex-col bg-white rounded-xl p-5'>
@@ -47,7 +49,10 @@ const OrderSummary = (props: OrderSummaryProps) => {
               })}
             </p>
           </div>
-          <button className='w-full flex itmes-center justify-center gap-x-3 bg-secondary-yellow hover:bg-primary-yellow active:bg-primary-yellow text-white py-3 mt-3 rounded-full cursor-pointer trasnsition-all ease-in-out'>
+          <button
+            className='w-full flex itmes-center justify-center gap-x-3 bg-secondary-yellow hover:bg-primary-yellow active:bg-primary-yellow text-white py-3 mt-3 rounded-full cursor-pointer trasnsition-all ease-in-out'
+            onClick={() => router.push('/payment')}
+          >
             <span className='font-bold'>Checkout</span>
             <MoveRight />
           </button>

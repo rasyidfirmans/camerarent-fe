@@ -45,7 +45,7 @@ const PaymentPage = () => {
 
   return (
     <main className='mt-28 mb-16 px-5 sm:px-16 lg:max-h-screen w-screen lg:max-w-[95%] xl:max-w-[80%] mx-auto'>
-      <section className='flex flex-col justify-center items-start lg:flex-row w-full gap-4'>
+      <section className='flex flex-col justify-center items-center lg:items-start lg:flex-row w-full gap-4'>
         <CheckoutSummary data={cartData} setCartData={setCartData} />
         <PaymentForm
           label={`Payment Form`}
