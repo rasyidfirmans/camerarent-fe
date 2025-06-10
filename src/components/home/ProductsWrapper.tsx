@@ -1,6 +1,6 @@
-import { apiFetch } from '@/lib/apiClient'
-import React from 'react'
-import { useEffect } from 'react'
+import { api } from '@/lib/apiClient'
+import { useQuery } from '@tanstack/react-query'
+import React, { useEffect } from 'react'
 import { z } from 'zod'
 import ProductCard from './ProductCard'
 import ProductCardSkeleton from './ProductSkeleton'
@@ -26,29 +26,35 @@ export type productType = z.infer<typeof productSchema>
 const ProductWrapper = () => {
   const [products, setProducts] = React.useState<productType[] | null>(null)
 
-  const apiResponse = async () => {
-    return await apiFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    })
+  const productQuery = () => {
+    try {
+      const res = api.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products`, {
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+      return res
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      throw error
+    }
   }
 
-  useEffect(() => {
-    const fetchedProducts = async () => {
-      const res = await apiResponse()
-      const products = apiResponseSchema.safeParse(res)
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: productQuery,
+  })
 
-      if (products.success) {
-        setProducts(products.data.data)
+  useEffect(() => {
+    if (!isLoading && !isError && data) {
+      const parsedData = apiResponseSchema.safeParse(data)
+      if (parsedData.success) {
+        setProducts(parsedData.data.data)
       } else {
-        console.error('Error fetching products:', products.error)
+        console.error('Invalid data format:', parsedData.error)
       }
     }
-
-    fetchedProducts()
-  }, [])
+  }, [data, isLoading, isError, error])
 
   return (
     <div className='w-full lg:w-3/4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 px-5'>
