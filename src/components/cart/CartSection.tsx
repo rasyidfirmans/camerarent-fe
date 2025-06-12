@@ -1,4 +1,4 @@
-import { Calendar } from 'lucide-react'
+import { Calendar, ShoppingBag } from 'lucide-react'
 import { ApiResponseCart } from './CartBody'
 import CartItem from './CartItem'
 
@@ -85,9 +85,9 @@ const CartSection = (props: CartSectionProps) => {
         <p className='w-[calc(100%+1rem)] sm:w-[calc(100%+2.5rem)] bg-white rounded-b-xl font-bold sticky top-0 pt-5 pb-3 px-5 text-lg -mx-2 sm:-mx-5'>
           {label || `Your Cart`}
         </p>
-        <div className='w-full flex flex-col gap-y-8'>
-          {data?.data?.length > 0 &&
-            Object.entries(groupCartItemsByDate(data.data)).map(
+        {data?.data?.length > 0 && (
+          <div className='w-full flex flex-col gap-y-8'>
+            {Object.entries(groupCartItemsByDate(data.data)).map(
               ([dateRange, items]) => (
                 <div key={dateRange} className='w-full flex flex-col gap-y-3'>
                   <div className='w-full flex items-center gap-x-2'>
@@ -114,7 +114,16 @@ const CartSection = (props: CartSectionProps) => {
                 </div>
               )
             )}
-        </div>
+          </div>
+        )}
+        {data?.data?.length === 0 && (
+          <div className='w-full h-full flex flex-col items-center justify-center gap-y-3'>
+            <ShoppingBag className='size-16 sm:size-24 md:size-32 text-gray-300' />
+            <p className='text-gray-400 text-md md:text-lg font-semibold'>
+              Your cart is empty
+            </p>
+          </div>
+        )}
       </div>
     </section>
   )

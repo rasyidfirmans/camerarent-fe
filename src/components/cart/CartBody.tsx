@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import CartSection from './CartSection'
 import OrderSummary from './OrderSummary'
+import { toast } from 'sonner'
 
 export type ApiResponseCart = {
   code: number
@@ -54,19 +55,26 @@ const CartBody = () => {
     queryFn: cartQuery,
   })
 
+  if (isError) {
+    console.error('Error fetching cart:', error)
+    toast.error('Oops! Something went wrong', {
+      description: 'We could not get your cart data. Please try again later.',
+    })
+  }
+
   useEffect(() => {
-    if (data) {
+    if (!isLoading && !isError && data) {
       setCartData(data)
     }
-  }, [data])
+  }, [data, isError, isLoading])
 
   return (
     <>
       <section className='flex flex-col lg:flex-row justify-center items-center lg:items-start gap-y-5 lg:gap-x-8 lg:max-w-[90%] xl:max-w-[80%] mx-auto px-5 md:px-16 mt-32 mb-16'>
         <CartSection
+          label='Your Cart'
           data={cartData}
           setCartData={setCartData}
-          // total_price={data?.total_price ?? 0}
         />
         <OrderSummary data={cartData} />
       </section>
