@@ -1,109 +1,78 @@
-import React from 'react'
+'use client'
 
-const dummyData = [
-  {
-    product: 'Product A',
-    date: '2023-10-01',
-    invoiceId: 'INV12345',
-    total: 1000000,
-    status: {
-      name: 'Accepted',
-      color: 'text-green-600',
-    },
-  },
-  {
-    product: 'Product B',
-    date: '2023-10-02',
-    invoiceId: 'INV12346',
-    total: 1000000,
-    status: {
-      name: 'Pending',
-      color: 'text-yellow-600',
-    },
-  },
-  {
-    product: 'Product C',
-    date: '2023-10-03',
-    invoiceId: 'INV12347',
-    total: 1000000,
-    status: {
-      name: 'Rejected',
-      color: 'text-red-600',
-    },
-  },
-  {
-    product: 'Product D',
-    date: '2023-10-04',
-    invoiceId: 'INV12348',
-    total: 1000000,
-    status: {
-      name: 'Accepted',
-      color: 'text-green-600',
-    },
-  },
-  {
-    product: 'Product E',
-    date: '2023-10-05',
-    invoiceId: 'INV12349',
-    total: 1000000,
-    status: {
-      name: 'Pending',
-      color: 'text-yellow-600',
-    },
-  },
-  {
-    product: 'Product F',
-    date: '2023-10-06',
-    invoiceId: 'INV12350',
-    total: 1000000,
-    status: {
-      name: 'Rejected',
-      color: 'text-red-600',
-    },
-  },
-  {
-    product: 'Product G',
-    date: '2023-10-07',
-    invoiceId: 'INV12351',
-    total: 1000000,
-    status: {
-      name: 'Accepted',
-      color: 'text-green-600',
-    },
-  },
-  {
-    product: 'Product H',
-    date: '2023-10-08',
-    invoiceId: 'INV12352',
-    total: 1000000,
-    status: {
-      name: 'Pending',
-      color: 'text-yellow-600',
-    },
-  },
-  {
-    product: 'Product I',
-    date: '2023-10-09',
-    invoiceId: 'INV12353',
-    total: 1000000,
-    status: {
-      name: 'Rejected',
-      color: 'text-red-600',
-    },
-  },
-  {
-    product: 'Product J',
-    date: '2023-10-10',
-    invoiceId: 'INV12354',
-    total: 1000000,
-    status: {
-      name: 'Accepted',
-      color: 'text-green-600',
-    },
-  },
-]
+import { api } from '@/lib/apiClient'
+import { getCookieAccessToken } from '@/lib/getToken'
+import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
+import React from 'react'
+import { toast } from 'sonner'
+
+type ApiResponseTransaction = {
+  id: number
+  user_id: number
+  validated_by: string | null
+  delivery: string
+  notes: string | null
+  payment_proof: string
+  status: string
+  invoice_id: string
+  total_price: number
+  created_at: string
+  updated_at: string
+  products: {
+    id: number
+    name: string
+    description: string
+    category_name: string
+    price: string
+    stock: number
+    image: string
+    quantity: string
+    start_date: string
+    end_date: string
+    subtotal: number
+    created_at: string
+    updated_at: string
+  }[]
+}[]
 
 const HistoryTable = () => {
+  const historyQuery = async () => {
+    try {
+      const accessToken = await getCookieAccessToken()
+      const res = api.get<ApiResponseTransaction>(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/transaction`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      return res
+    } catch (error) {
+      console.error('Error fetching transaction history:', error)
+      throw error
+    }
+  }
+
+  const {
+    isLoading,
+    isError,
+    error,
+    data: transactions,
+  } = useQuery<ApiResponseTransaction>({
+    queryKey: ['get_transaction_history'],
+    queryFn: historyQuery,
+  })
+
+  if (isError) {
+    console.error('Error fetching transaction history:', error)
+    toast.error('System Error', {
+      description:
+        'Oops! Something went wrong while displaying your transaction history',
+    })
+  }
+
   return (
     <table className='w-[55rem] sm:w-[65rem] md:w-[70rem] xl:w-full h-[85%] text-left text-sm md:text-base table-auto min-w-max border-collapse rounded-xl'>
       <thead className='w-full block rounded-t-xl bg-primary-blue/5'>
@@ -117,33 +86,67 @@ const HistoryTable = () => {
         </tr>
       </thead>
       <tbody className='block h-full overflow-y-auto'>
-        {dummyData.map((data, index) => (
-          <React.Fragment key={index}>
-            <tr className='flex items-center w-full px-3 py-1 md:px-5 md:py-3'>
-              <td className='w-[30%]'>{data.product}</td>
-              <td className='w-[15%]'>{data.date}</td>
-              <td className='w-[20%]'>{data.invoiceId}</td>
-              <td className='w-[15%]'>
-                {data.total.toLocaleString('id-ID', {
-                  style: 'currency',
-                  currency: 'IDR',
-                  minimumFractionDigits: 0,
-                })}
-              </td>
-              <td className={`w-[10%] font-semibold ${data.status.color}`}>
-                {data.status.name}
-              </td>
-              <td className='w-[10%] text-right'>
-                <button className='text-white bg-secondary-yellow hover:bg-primary-yellow active:bg-primary-yellow py-2 px-3 rounded-lg cursor-pointer transition-all duration-200 ease-in-out'>
-                  Details
-                </button>
-              </td>
-            </tr>
-            {dummyData.length - 1 !== index && (
-              <tr className='block w-full h-0.25 sm:h-0.5 bg-slate-200'></tr>
-            )}
-          </React.Fragment>
-        ))}
+        {!isLoading &&
+          !isError &&
+          transactions &&
+          transactions.map((transaction, index) => (
+            <React.Fragment key={index}>
+              <tr className='flex items-center w-full px-3 py-1 md:px-5 md:py-3'>
+                <td className='w-[30%]'>
+                  <div className='flex items-center gap-3'>
+                    <Image
+                      src={`http://laravel.local/${transaction.products[0].image}`}
+                      alt={transaction.products[0].name}
+                      width={0}
+                      height={0}
+                      sizes='100vw'
+                      className='w-16 h-16 object-cover rounded-lg'
+                    />
+                    <div>
+                      <h3 className='font-semibold text-base md:text-lg'>
+                        {transaction.products[0].name}
+                      </h3>
+                      <p className='text-xs md:text-sm text-slate-500'>
+                        {transaction.products.length > 1
+                          ? 'and ' + (transaction.products.length - 1) + ' more'
+                          : ''}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className='w-[15%]'>{transaction.created_at}</td>
+                <td className='w-[20%]'>{transaction.invoice_id}</td>
+                <td className='w-[15%]'>
+                  {transaction.total_price.toLocaleString('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0,
+                  })}
+                </td>
+                <td
+                  className={`w-[10%] font-semibold ${
+                    transaction.status.toLowerCase() === 'success'
+                      ? 'text-green-600'
+                      : transaction.status.toLowerCase() === 'pending'
+                      ? 'text-yellow-600'
+                      : transaction.status.toLowerCase() === 'rejected'
+                      ? 'text-red-600'
+                      : ''
+                  }`}
+                >
+                  {transaction.status}
+                </td>
+                <td className='w-[10%] text-right'>
+                  <button className='text-white bg-secondary-yellow hover:bg-primary-yellow active:bg-primary-yellow py-2 px-3 rounded-lg cursor-pointer transition-all duration-200 ease-in-out'>
+                    Details
+                  </button>
+                </td>
+              </tr>
+              {transactions.length - 1 !== index && (
+                <tr className='block w-full h-0.25 sm:h-0.5 bg-slate-200'></tr>
+              )}
+            </React.Fragment>
+          ))}
       </tbody>
     </table>
   )
