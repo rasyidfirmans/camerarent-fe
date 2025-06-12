@@ -7,14 +7,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Minus, Plus, ShoppingCart } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useContext, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 const RentFormSchema = z
   .object({
     start_date: z.preprocess(
-      (val) => (val ? new Date(val as string) : null),
+      (val) => (val ? new Date(val as string) : undefined),
       z
         .date({
           required_error: 'Start date is required',
@@ -25,7 +26,7 @@ const RentFormSchema = z
         })
     ),
     end_date: z.preprocess(
-      (val) => (val ? new Date(val as string) : null),
+      (val) => (val ? new Date(val as string) : undefined),
       z.date({
         required_error: 'End date is required',
         invalid_type_error: 'Invalid end date',
@@ -76,7 +77,7 @@ type RentDetailProps = {
   product: { product_id: number; price: number | string }
 }
 
-const toMysqlDatetime = (isoString) => {
+const toMysqlDatetime = (isoString: string | number | Date) => {
   const date = new Date(isoString)
 
   const year = date.getUTCFullYear()
@@ -164,6 +165,9 @@ const RentDetails = (props: RentDetailProps) => {
     } else {
       mutation.mutate(convertedData)
       router.push('/cart')
+      toast.success('Product added to cart successfully', {
+        description: 'You can view your cart to proceed with the payment.',
+      })
     }
   }
 
@@ -187,7 +191,7 @@ const RentDetails = (props: RentDetailProps) => {
     setValue('quantity', quantity + 1)
   }
 
-  const calculateRentPeriod = () => {
+  const calculateRentPeriod = useCallback(() => {
     if (rentFormFields.start_date && rentFormFields.end_date) {
       const start = new Date(rentFormFields.start_date as Date)
       const end = new Date(rentFormFields.end_date as Date)
@@ -205,25 +209,49 @@ const RentDetails = (props: RentDetailProps) => {
         }
       }
     }
-  }
+  }, [rentFormFields.start_date, rentFormFields.end_date, rentPeriodRef])
 
-  const calculateSubTotal = (price: number | string, quantity: number) => {
-    product.price =
-      typeof product.price === 'string'
-        ? parseFloat(product.price)
-        : product.price
-    const diffDays = calculateRentPeriod()
+  const calculateSubTotal = useCallback(
+    (price: number | string, quantity: number) => {
+      product.price =
+        typeof product.price === 'string'
+          ? parseFloat(product.price)
+          : product.price
+      const diffDays = calculateRentPeriod()
 
-    if (diffDays) {
-      const subTotal = product.price * quantity * diffDays
-      if (subTotalRef.current) {
-        subTotalRef.current.innerHTML = subTotal.toLocaleString('id-ID', {
-          style: 'currency',
-          currency: 'IDR',
-        })
+      if (diffDays) {
+        const subTotal = product.price * quantity * diffDays
+        if (subTotalRef.current) {
+          subTotalRef.current.innerHTML = subTotal.toLocaleString('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+          })
+        }
       }
+    },
+    [product, calculateRentPeriod, subTotalRef]
+  )
+
+  useEffect(() => {
+    if (
+      rentFormFields.start_date &&
+      rentFormFields.end_date &&
+      !errors.start_date &&
+      !errors.end_date
+    ) {
+      calculateRentPeriod()
+      calculateSubTotal(product.price, quantity)
     }
-  }
+  }, [
+    rentFormFields.start_date,
+    rentFormFields.end_date,
+    quantity,
+    errors.start_date,
+    errors.end_date,
+    product.price,
+    calculateRentPeriod,
+    calculateSubTotal,
+  ])
 
   return (
     <section className='w-full lg:w-1/2 xl:w-1/3 h-full bg-white/20 backdrop-blur-md rounded-xl border border-slate-300 p-5 shadow-xl'>
@@ -249,10 +277,6 @@ const RentDetails = (props: RentDetailProps) => {
                   ? 'border-red-600 focus:ring-red-600'
                   : 'border-slate-400 focus:ring-primary-blue'
               }`}
-              onBlur={() => {
-                calculateRentPeriod()
-                calculateSubTotal(product.price, quantity)
-              }}
             />
             <p
               className={`${
@@ -276,10 +300,6 @@ const RentDetails = (props: RentDetailProps) => {
                   ? 'border-red-600 focus:ring-red-600'
                   : 'border-slate-400 focus:ring-primary-blue'
               }`}
-              onBlur={() => {
-                calculateRentPeriod()
-                calculateSubTotal(product.price, quantity)
-              }}
             />
             <p
               className={`${
@@ -324,12 +344,10 @@ const RentDetails = (props: RentDetailProps) => {
           <div className='flex flex-col gap-y-3'>
             <div className='w-full flex items-center justify-between'>
               <p>Rent Period</p>
-              {!errors.start_date && !errors.end_date && !errors.quantity && (
-                <p ref={rentPeriodRef} className='font-bold'></p>
-              )}
+              <p ref={rentPeriodRef} className='font-bold'></p>
             </div>
             <div className='w-full flex items-center justify-between'>
-              <p>product.price</p>
+              <p>Price</p>
               <p className='font-bold'>
                 {Number(product.price).toLocaleString('id-ID', {
                   style: 'currency',
@@ -348,15 +366,13 @@ const RentDetails = (props: RentDetailProps) => {
             </div>
             <div className='w-full flex items-center justify-between'>
               <p className='font-bold'>Sub Total</p>
-              {!errors.start_date && !errors.end_date && !errors.quantity && (
-                <p ref={subTotalRef} className='font-bold'></p>
-              )}
+              <p ref={subTotalRef} className='font-bold'></p>
             </div>
           </div>
 
           <button
             type='submit'
-            className='w-full flex items-center justify-center bg-secondary-yellow hover:bg-primary-yellow py-5 font-bold rounded-xl gap-x-3'
+            className='w-full flex items-center justify-center bg-secondary-yellow hover:bg-primary-yellow disabled:bg-slate-400/60 disabled:text-white disabled:cursor-not-allowed py-5 font-bold rounded-xl gap-x-3 cursor-pointer transition-all duration-200 ease-in-out'
           >
             <ShoppingCart />
             <span>Add to Cart</span>

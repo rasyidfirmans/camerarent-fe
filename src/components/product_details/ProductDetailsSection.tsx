@@ -24,6 +24,7 @@ const ProductDetailsSection = (props: ProductDetailsProps) => {
           width={0}
           height={0}
           sizes='100vw'
+          priority={true}
           className='size-[70%] sm:size-[60%] md:size-[50%] lg:w-full lg:h-[80%] xl:w-[80%] aspect-square object-contain rounded-xl'
         />
       </div>
