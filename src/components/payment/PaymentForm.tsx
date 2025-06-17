@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getCookieAccessToken } from '@/lib/getToken'
 import { api } from '@/lib/apiClient'
+import { useRouter } from 'next/navigation'
 
 const PaymentFormSchema = z.object({
   delivery: z.string({
@@ -54,6 +55,7 @@ const PaymentForm = (props: PaymentFormProps) => {
     reValidateMode: 'onBlur',
   })
   const queryClient = useQueryClient()
+  const router = useRouter()
 
   const transactionFormData = (
     submittedData: z.infer<typeof PaymentFormSchema>,
@@ -168,6 +170,7 @@ const PaymentForm = (props: PaymentFormProps) => {
     onSuccess: () => {
       clearCart.mutate()
       queryClient.invalidateQueries({ queryKey: ['get_transaction'] })
+      router.push('/history')
     },
     onError: (error) => {
       console.error('Error during transaction mutation:', error)
@@ -184,9 +187,14 @@ const PaymentForm = (props: PaymentFormProps) => {
     },
   })
 
-  const onSubmit = (data: z.infer<typeof PaymentFormSchema>) => {
+  const onSubmit = (submittedData: z.infer<typeof PaymentFormSchema>) => {
+    if (data?.data.length === 0) {
+      const cartUrl = new URL('/cart', window.location.href)
+      cartUrl.searchParams.set('error', 'empty_cart_payment_attempt')
+      router.push(cartUrl.toString())
+    }
     if (!isLoading && !isError && cartData) {
-      storeTransaction.mutate({ submittedData: data, cartData })
+      storeTransaction.mutate({ submittedData: submittedData, cartData })
     }
   }
 

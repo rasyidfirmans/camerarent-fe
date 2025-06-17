@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRefreshAccessToken } from './lib/getToken'
+import { ApiResponseCart } from './components/cart/CartBody'
+import { api } from './lib/apiClient'
+import { getCookieAccessToken, getRefreshAccessToken } from './lib/getToken'
 
 export async function middleware(request: NextRequest) {
   const protectedPaths = ['/cart', '/payment', '/transaction']
@@ -19,6 +21,34 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPath && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  if (isLoggedIn && pathname.startsWith('/payment')) {
+    try {
+      const accessToken = await getCookieAccessToken()
+      const res = await api.get<ApiResponseCart>(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/cart`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: 'application/json',
+          },
+        }
+      )
+
+      if (res.data.length > 0) {
+        return NextResponse.next()
+      } else {
+        const cartUrl = new URL('/cart', request.url)
+        cartUrl.searchParams.set('error', 'empty_cart_payment_attempt')
+        return NextResponse.redirect(cartUrl)
+      }
+    } catch (error) {
+      console.error('Error in payment middleware:', error)
+      const cartUrl = new URL('/cart', request.url)
+      cartUrl.searchParams.set('error', 'cart_fetch_failed')
+      return NextResponse.redirect(cartUrl)
+    }
   }
 }
 

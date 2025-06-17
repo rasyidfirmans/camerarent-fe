@@ -14,6 +14,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
+      <Toaster richColors position='bottom-right' closeButton={false} />
       {isExcludedPath ? (
         children
       ) : (
@@ -23,7 +24,6 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
           {!isExcludedPath && <Footer />}
         </LoginContextProvider>
       )}
-      <Toaster richColors position='bottom-right' closeButton={false} />
     </>
   )
 }
