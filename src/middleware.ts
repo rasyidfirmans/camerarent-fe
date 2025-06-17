@@ -4,9 +4,13 @@ import { api } from './lib/apiClient'
 import { getCookieAccessToken, getRefreshAccessToken } from './lib/getToken'
 
 export async function middleware(request: NextRequest) {
-  const protectedPaths = ['/cart', '/payment', '/transaction']
+  const protectedPaths = ['/cart', '/payment', '/transaction', '/dashboard']
+  const superUserPaths = ['/dashboard/orders', '/dashboard/products']
   const pathname = request.nextUrl.pathname
   const isProtectedPath = protectedPaths.some((path) =>
+    pathname.startsWith(path)
+  )
+  const isSuperUserPath = superUserPaths.some((path) =>
     pathname.startsWith(path)
   )
   let isLoggedIn = request.cookies.get('access_token')?.value ? true : false
@@ -21,6 +25,15 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPath && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  if (isLoggedIn && isSuperUserPath) {
+    const role = request.cookies.get('role')?.value
+    if (role === 'admin') {
+      return NextResponse.next()
+    } else if (role === 'user') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
   if (isLoggedIn && pathname.startsWith('/payment')) {

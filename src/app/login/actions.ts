@@ -28,6 +28,7 @@ const loginAction = async (loginData: LoginFormData) => {
       message: string
       access_token: string
       refresh_token: string
+      role: string
     }
 
     if (parsedResponse.code !== 200) {
@@ -47,6 +48,13 @@ const loginAction = async (loginData: LoginFormData) => {
       maxAge: 60 * 60,
     })
     cookieStore.set('refresh_token', parsedResponse.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 30,
+    })
+    cookieStore.set('role', parsedResponse.role, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
