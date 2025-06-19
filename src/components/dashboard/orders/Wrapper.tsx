@@ -1,6 +1,6 @@
 import SideBar from "../SideBar";
 import Header from "./Header";
-import HistoryTable from "./HistoryTable";
+import HistoryTable from "./OrdersTable";
 
 const Wrapper = () => {
   return (
